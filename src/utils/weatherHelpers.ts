@@ -164,8 +164,8 @@ export function getWeatherEmojiForTime(
  * @returns Direction cardinale (N, NE, E, SE, S, SO, O, NO)
  */
 export function windDirectionToText(deg?: number): string {
-  // Si pas de direction, retourner N/A
-  if (deg == null) return 'N/A';
+  // Si pas de direction, retourner N/D
+  if (deg == null) return 'N/D';
 
   // Tableau des 8 directions cardinales
   const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
@@ -184,8 +184,8 @@ export function windDirectionToText(deg?: number): string {
  * @returns String formatée (ex: "10.5 km" ou "500 m")
  */
 export function formatVisibility(meters?: number): string {
-  // Si pas de visibilité ou 0, retourner N/A
-  if (meters == null || meters === 0) return 'N/A';
+  // Si pas de visibilité ou 0, retourner N/D
+  if (meters == null || meters === 0) return 'N/D';
 
   // Si >= 1000m, convertir en km avec 1 décimale
   if (meters >= 1000) {

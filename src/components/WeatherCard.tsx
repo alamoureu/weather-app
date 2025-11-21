@@ -18,10 +18,47 @@ import { getWeatherEmojiForDay } from "../utils/weatherHelpers";
 import type { WeatherData } from "../types/weather";
 
 interface WeatherCardProps {
-  weather: WeatherData; // Données météo à afficher
+  weather?: WeatherData; // Données météo à afficher
+  isLoading?: boolean; // État de chargement
 }
 
-export function WeatherCard({ weather }: WeatherCardProps) {
+export function WeatherCard({ weather, isLoading }: WeatherCardProps) {
+  if (isLoading || !weather) {
+    return (
+      <Box
+        borderRadius="2xl"
+        bgGradient="linear(to-br, rgba(59, 130, 246, 0.8), rgba(147, 51, 234, 0.8))"
+        backdropFilter="blur(20px) saturate(180%)"
+        boxShadow="0 8px 32px rgba(0,0,0,0.3)"
+        p={4}
+        color="white"
+        minH="180px"
+        h="180px"
+      >
+        <HStack justify="space-between" align="flex-start">
+          <VStack spacing={1} align="flex-start">
+            <HStack spacing={2}>
+              <Box width="80px" height="24px" bg="whiteAlpha.200" borderRadius="md" />
+              <Box width="40px" height="18px" bg="whiteAlpha.200" borderRadius="md" />
+            </HStack>
+            <Box width="120px" height="16px" bg="whiteAlpha.200" borderRadius="md" />
+          </VStack>
+          <Box width="48px" height="48px" bg="whiteAlpha.200" borderRadius="md" />
+        </HStack>
+        <HStack mt={3} align="flex-end" justify="space-between">
+          <VStack align="flex-start" spacing={0}>
+            <Box width="60px" height="48px" bg="whiteAlpha.200" borderRadius="md" />
+            <Box width="90px" height="16px" bg="whiteAlpha.200" borderRadius="md" mt={1} />
+          </VStack>
+          <VStack align="flex-end" spacing={0}>
+            <Box width="140px" height="16px" bg="whiteAlpha.200" borderRadius="md" />
+            <Box width="120px" height="16px" bg="whiteAlpha.200" borderRadius="md" mt={1} />
+          </VStack>
+        </HStack>
+      </Box>
+    );
+  }
+
   return (
     // Carte principale avec dégradé bleu/violet et effet glassmorphism
     <Box
@@ -31,6 +68,8 @@ export function WeatherCard({ weather }: WeatherCardProps) {
       boxShadow="0 8px 32px rgba(0,0,0,0.3)"               // Ombre portée
       p={4}                                                 // Padding interne
       color="white"                                         // Texte blanc
+      minH="180px"
+      h="180px"
     >
       {/* Ligne supérieure : ville, pays, description, emoji */}
       <HStack justify="space-between" align="flex-start">
@@ -92,7 +131,7 @@ export function WeatherCard({ weather }: WeatherCardProps) {
           {/* Températures min/max (si disponibles) */}
           {weather.tempMin != null && weather.tempMax != null && (
             <Text fontSize="xs">
-              Min {Math.round(weather.tempMin)}° • Max {Math.round(weather.tempMax)}°
+              Min. {Math.round(weather.tempMin)}° • Max. {Math.round(weather.tempMax)}°
             </Text>
           )}
           {/* Lever et coucher du soleil (si disponibles) */}

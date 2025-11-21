@@ -106,12 +106,6 @@ export function CitySearch({ city, onCityChange, onSearch, onCitySelect, isLoadi
               bg={colorMode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"} // Fond semi-transparent
               backdropFilter="blur(8px)"    // Effet glassmorphism
               color={colorMode === "dark" ? "gray.300" : "gray.700"} // Couleur du texte
-              _hover={{                    // Styles au survol
-                bg: colorMode === "dark" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.1)", // Fond plus opaque
-                transform: "scale(1.05)",   // Légère augmentation de taille
-                backdropFilter: "blur(10px)", // Flou plus prononcé
-              }}
-              transition="all 0.2s"        // Animation douce
               whiteSpace="nowrap"           // Empêcher le retour à la ligne
               disabled={isLoading}           // Désactivé pendant le chargement
               cursor={isLoading ? "not-allowed" : "pointer"} // Curseur selon l'état

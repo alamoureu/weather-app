@@ -12,7 +12,8 @@
  * Aucune donnée n'est inventée ou estimée (sauf la description météo générée depuis les codes WMO).
  */
 
-import { Box, Container, VStack, HStack, Text, Divider, useColorMode } from "@chakra-ui/react";
+import { Box, Container, VStack, HStack, Text, Divider, useColorMode, Image, IconButton } from "@chakra-ui/react";
+import { RepeatIcon } from "@chakra-ui/icons";
 import { useState, useEffect } from "react";
 import { useWeather } from "./hooks/useWeather";
 import { ThemeToggle } from "./components/ThemeToggle";
@@ -20,7 +21,6 @@ import { CitySearch } from "./components/CitySearch";
 import { WeatherCard } from "./components/WeatherCard";
 import { HourlyForecast } from "./components/HourlyForecast";
 import { WeatherStats } from "./components/WeatherStats";
-import { WeatherLoadingState } from "./components/WeatherLoadingState";
 import { WeatherErrorState } from "./components/WeatherErrorState";
 import { WeatherIdleState } from "./components/WeatherIdleState";
 
@@ -28,12 +28,13 @@ const DEFAULT_CITY = "Montréal";
 
 function App() {
   const [city, setCity] = useState(DEFAULT_CITY);
-  const { weather, hourlyForecasts, status, refreshKey, search, refresh } = useWeather(DEFAULT_CITY);
+  const { weather, hourlyForecasts, status, search, refresh } = useWeather(DEFAULT_CITY);
   const { colorMode } = useColorMode();
 
   useEffect(() => {
     search(DEFAULT_CITY);
-  }, [search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     // Container principal centré verticalement et horizontalement
@@ -58,14 +59,47 @@ function App() {
         py={5}                         // Padding vertical
         position="relative"           // Position relative pour le bouton thème en absolu
       >
-        {/* Bouton de changement de thème (composant séparé) */}
-        <ThemeToggle />
+        {/* Boutons en haut à droite */}
+        <Box position="absolute" top={4} right={4} zIndex={10}>
+          <HStack spacing={2}>
+            {/* Bouton de refresh - visible seulement quand on a des données */}
+            {(status === "success" || status === "loading") && (
+              <IconButton
+                aria-label="Actualiser les données"
+                size="sm"
+                variant="ghost"
+                onClick={refresh}
+                icon={<RepeatIcon />}
+                borderRadius="full"
+                bg={colorMode === "dark" ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"}
+                backdropFilter="blur(10px)"
+                _hover={{
+                  bg: colorMode === "dark" ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.1)",
+                  transform: "scale(1.05)",
+                  backdropFilter: "blur(12px)",
+                }}
+                transition="all 0.2s"
+                isLoading={status === "loading"}
+              />
+            )}
+            {/* Bouton de changement de thème */}
+            <ThemeToggle />
+          </HStack>
+        </Box>
 
         {/* En-tête de l'application */}
         <Box mb={4}>
-          <Text fontSize="lg" fontWeight="semibold" letterSpacing="wide">
-            Mon Dashboard Météo
-          </Text>
+          <HStack spacing={2} align="center" mb={1}>
+            <Image
+              src="/octopus.svg"
+              alt="Octopus Logo"
+              boxSize="28px"
+              objectFit="contain"
+            />
+            <Text fontSize="lg" fontWeight="semibold" letterSpacing="wide">
+              Octo Weather
+            </Text>
+          </HStack>
           <Text fontSize="xs" color={colorMode === "dark" ? "gray.400" : "gray.600"}>
             Mobile-first • Chakra UI v2
           </Text>
@@ -82,39 +116,24 @@ function App() {
         <Divider borderColor={colorMode === "dark" ? "whiteAlpha.200" : "blackAlpha.200"} mb={3} />
 
         {status === "idle" && <WeatherIdleState />}
-        {status === "loading" && <WeatherLoadingState />}
         {status === "error" && <WeatherErrorState onRetry={refresh} />}
 
-        {/* État : Success - Données chargées avec succès */}
-        {status === "success" && weather && (
+        {/* État : Loading ou Success - Afficher les composants avec skeleton si loading */}
+        {(status === "loading" || status === "success") && (
           <VStack spacing={3} align="stretch">
             {/* Carte principale météo (composant séparé) */}
-            <WeatherCard weather={weather} />
+            <WeatherCard weather={weather || undefined} isLoading={status === "loading"} />
 
             {/* Prévisions horaires (composant séparé) */}
             <HourlyForecast 
               forecasts={hourlyForecasts} 
-              sunriseIso={weather.sunriseIso}
-              sunsetIso={weather.sunsetIso}
+              sunriseIso={weather?.sunriseIso}
+              sunsetIso={weather?.sunsetIso}
+              isLoading={status === "loading"}
             />
 
             {/* Statistiques détaillées (composant séparé) */}
-            <WeatherStats weather={weather} />
-
-            <HStack justify="space-between" mt={1}>
-              <Text fontSize="2xs" color={colorMode === "dark" ? "gray.500" : "gray.500"}>
-                Dernier refresh #{refreshKey}
-              </Text>
-              <Text
-                fontSize="xs"
-                color={colorMode === "dark" ? "blue.300" : "blue.600"}
-                cursor="pointer"
-                onClick={refresh}
-                _hover={{ textDecoration: "underline" }}
-              >
-                Actualiser les données
-              </Text>
-            </HStack>
+            <WeatherStats weather={weather || undefined} isLoading={status === "loading"} />
           </VStack>
         )}
       </Box>
